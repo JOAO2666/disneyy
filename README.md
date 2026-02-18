@@ -2,41 +2,41 @@
 
 <div align="center">
     <img src="https://i0.wp.com/www.appletips.nl/wp-content/uploads/2019/09/disney-logo.png?fit=1550%2C1550&ssl=1" alt="Logo" width='200' style="border-radius:50px">
-  <h2 align="center">Disney Plus App Clone</h1>
+  <h2 align="center">Clone do Disney Plus</h1>
     <br />
-    <a href="https://mkwiecien00.github.io/disney-plus-clone/">View Demo</a>
+    <a href="https://disney-plus-joao2666.netlify.app">Ver Demo</a>
     ·
-    <a href="https://github.com/mkwiecien00/disney-plus-clone">Explore the docs</a>
+    <a href="https://github.com/JOAO2666/Disney">Explorar Documentação</a>
 </div>
 
 <details open="open">
-  <summary>Table of Contents</summary>
+  <summary>Índice</summary>
   <ol>
     <li>
-      <a href="#about-the-project">About The Project</a>
+      <a href="#sobre-o-projeto">Sobre o Projeto</a>
       <ul>
-        <li><a href="#usage">Usage</a></li>
+        <li><a href="#uso">Uso</a></li>
       </ul>
     </li>
-      <li><a href="#sample-credentials">Sample Credentials</a></li>
+      <li><a href="#credenciais-de-exemplo">Credenciais de Exemplo</a></li>
     <li>
-      <a href="#getting-started">Getting Started</a>
+      <a href="#como-começar">Como Começar</a>
       <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
+        <li><a href="#pré-requisitos">Pré-requisitos</a></li>
+        <li><a href="#instalação">Instalação</a></li>
       </ul>
     </li>
-    <li><a href="#contact">Contact</a></li>
+    <li><a href="#contato">Contato</a></li>
   </ol>
 </details>
 
-<!-- ABOUT THE PROJECT -->
+<!-- SOBRE O PROJETO -->
 
-## About The Project
+## Sobre o Projeto
 
-This project is an attempt to clone the Disney+ App. It is so far built with React, Redux Toolkit, React Router, Tanstack Query, Vite, styled components, Material UI, Framer Motion, Firebase, the TMDB API and other third-party libraries such as React Spinners. Moreover, it is fully responsive and follows the mobile-first concept.
+Este projeto é uma tentativa de clonar o aplicativo Disney+. Até o momento, foi construído com React, Redux Toolkit, React Router, Tanstack Query, Vite, styled components, Material UI, Framer Motion, Firebase, a API do TMDB e outras bibliotecas de terceiros como React Spinners. Além disso, é totalmente responsivo e segue o conceito mobile-first.
 
-<!-- DESKTOP SCREENSHOTS -->
+<!-- CAPTURAS DE TELA DESKTOP -->
 <img src="./src/assets/screenshots/desktop/homepage.png"/>
 
 <img src="./src/assets/screenshots/desktop/details.png"/>
@@ -45,7 +45,7 @@ This project is an attempt to clone the Disney+ App. It is so far built with Rea
 
 <img src="./src/assets/screenshots/desktop/movies.png"/>
 
-<!-- MOBILE SCREENSHOTS -->
+<!-- CAPTURAS DE TELA MOBILE -->
 
 <img src="./src/assets/screenshots/mobile/homepage.png" width="45%"/> <img src="./src/assets/screenshots/mobile/details.png" width="45%"/>
 
@@ -61,97 +61,94 @@ https://github.com/mkwiecien00/disney-plus-clone/assets/99047592/3c2c1136-b330-4
 
 
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
 
-### Usage
+### Uso
 
-This app was created to develop my skills in programming in React and in using a React-related environment.
+Este aplicativo foi criado para desenvolver minhas habilidades em programação com React e na utilização de um ambiente relacionado ao React.
 
-For signed-in users, the currently functional links in the app are links to the Disney+ homepage, Movie/Series Details page, Search page, My List page, and the Movies/Series pages.
-For those who are not signed in, it is only possible to view the Homepage, but actually without the possibility to go any further.
-For such users, in the upper right corner of the Homepage, there is a 'GET STARTED' button, which takes the user to a SignIn/Up Page.
-Once signed into the platform, the user has full access to it.
+Para usuários conectados, os links funcionais no aplicativo são: página inicial do Disney+, página de Detalhes de Filme/Série, página de Busca, página Minha Lista e as páginas de Filmes/Séries.
+Para aqueles que não estão conectados, só é possível visualizar a Página Inicial, mas sem a possibilidade de ir mais adiante.
+Para esses usuários, no canto superior direito da Página Inicial, há um botão 'COMEÇAR', que leva o usuário a uma Página de Login/Cadastro.
+Uma vez conectado à plataforma, o usuário tem acesso total a ela.
 
-At the moment, the application offers the user, among other things:
+No momento, o aplicativo oferece ao usuário, entre outras coisas:
 
-- the possibility to display real-time data thanks to the TMDB API,
-- the display of details for each resource including the trailer video,
-- the search and display of resources that contain a phrase entered by the user,
-- the possibility to store resources chosen individually by each user to be viewed,
-- and the ability to search for resources of specific genres, e.g. searching only for documentaries.
+- a possibilidade de exibir dados em tempo real graças à API do TMDB,
+- a exibição de detalhes para cada recurso, incluindo o vídeo do trailer,
+- a busca e exibição de recursos que contêm uma frase digitada pelo usuário,
+- a possibilidade de armazenar recursos escolhidos individualmente por cada usuário para serem visualizados,
+- e a capacidade de buscar recursos de gêneros específicos, por exemplo, buscar apenas documentários.
 
-When visiting other pages, with the navigation, an error page is displayed thanks to React Router, as the pages' url's are not recognisable.
-This application has protected routes that can only be accessed by signed-in users. Anytime a non-logged-in person wants to go to a protected page, a login panel is displayed.
+Ao visitar outras páginas, com a navegação, uma página de erro é exibida graças ao React Router, pois as URLs das páginas não são reconhecíveis.
+Este aplicativo possui rotas protegidas que só podem ser acessadas por usuários conectados. Sempre que uma pessoa não conectada quiser acessar uma página protegida, um painel de login é exibido.
 
-Users are logged out after 5 minutes of being inactive.
-
-
+Os usuários são desconectados após 5 minutos de inatividade.
 
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- SAMPLE CREDENTIALS -->
 
-## Sample Credentials
+<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
 
-**Sample login details, please enter them into the sign-in panel in order to use this app:**
+<!-- CREDENCIAIS DE EXEMPLO -->
+
+## Credenciais de Exemplo
+
+**Dados de login de exemplo, por favor insira-os no painel de login para usar este aplicativo:**
 
 - login: test@test.com
-- password: test123
+- senha: test123
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
 
-<!-- GETTING STARTED -->
+<!-- COMO COMEÇAR -->
 
-## Getting Started
+## Como Começar
 
-### Prerequisites
+### Pré-requisitos
 
-- Node.js installed on your machine.
-- To make this project work while hosting it on GitHub Pages, I hardcoded my own TMDB API key and Firebase Config.
+- Node.js instalado na sua máquina.
+- Para fazer este projeto funcionar ao hospedá-lo no GitHub Pages, eu codifiquei diretamente minha própria chave de API do TMDB e a configuração do Firebase.
 
-Nevertheless, please note that the good practice is actually to store the credentials as environmental variables and use gitignore on the .env file to hide them in the public repo. It is also important to modify your website's code to access the API keys from the environment variables instead of hardcoding them.
+No entanto, observe que a boa prática é armazenar as credenciais como variáveis de ambiente e usar o gitignore no arquivo .env para ocultá-las no repositório público. Também é importante modificar o código do seu site para acessar as chaves de API a partir das variáveis de ambiente em vez de codificá-las diretamente.
 
-If you want to use your own TMDB API key, you can get it by creating an account on the [TMDB](https://www.themoviedb.org/) website. Please then follow the [documentation](https://developers.themoviedb.org/3/getting-started/introduction) to create the API key.
-You might also want to use your own Firebase Config, and for that you will need an account on [Firebase](https://firebase.google.com). Then, you should create a project on your Firebase account dedicated to this Disney+ project.
+Se você quiser usar sua própria chave de API do TMDB, pode obtê-la criando uma conta no site [TMDB](https://www.themoviedb.org/). Por favor, siga a [documentação](https://developers.themoviedb.org/3/getting-started/introduction) para criar a chave de API.
+Você também pode querer usar sua própria configuração do Firebase, e para isso precisará de uma conta no [Firebase](https://firebase.google.com). Depois, você deve criar um projeto na sua conta Firebase dedicado a este projeto Disney+.
 
-Since we're using GitHub Pages, it is worth remembering that it provides hosting only for static sites. In other words, a GitHub Pages site hosts only HTML and JavaScript and doesn't provide any server-side support. Everything we publish there is available to clients.
-Therefore, in order to ensure the security of credentials and provide them for GitHub Pages so that GitHub Pages would be able to use them, we would need some sort of backend server to hold them.
+### Instalação
 
-### Installation
-
-1. Clone the repository:
+1. Clone o repositório:
 
    ```
-   git clone https://github.com/mkwiecien00/disney-plus-clone.git
+   git clone https://github.com/JOAO2666/Disney.git
    ```
 
-2. Navigate to the project directory:
+2. Navegue até o diretório do projeto:
 
    ```
-   cd disney-plus-clone
+   cd Disney
    ```
 
-3. Install the dependencies:
+3. Instale as dependências:
 
    ```
    npm install
    ```
 
-4. Start the development server:
+4. Inicie o servidor de desenvolvimento:
 
    ```
    npm run dev
    ```
 
-5. Open your browser and visit http://localhost:5173 to view the application.
+5. Abra seu navegador e acesse http://localhost:5173 para visualizar o aplicativo.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
 
-<!-- CONTACT -->
+<!-- CONTATO -->
 
-## Contact
+## Contato
 
-LinkedIn - [Małgorzata Kwiecień](https://www.linkedin.com/in/malgorzatakwiecien00/)
+GitHub - [JOAO2666](https://github.com/JOAO2666)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>

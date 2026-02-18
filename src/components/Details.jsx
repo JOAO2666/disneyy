@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import PropTypes from 'prop-types'
@@ -8,7 +9,6 @@ import useScroll from '@hooks/use-scroll'
 import { detailsData } from '@utils/details/details-data'
 import useDetail from '@hooks/use-detail'
 import useVideo from '@hooks/use-video'
-import { findMovieByTmdbId, getPlayerUrl } from '@utils/custom-movies'
 
 import Container from '@components/ui/Container'
 import Loader from '@components/ui/Loader'
@@ -22,7 +22,11 @@ import DetailParagraph from '@components/ui/DetailParagraph'
 import DetailDescription from '@components/ui/DetailDescription'
 import BackButton from '@components/ui/BackButton'
 import VideoPlayer from '@components/VideoPlayer'
+import NetflixPlayer from '@components/NetflixPlayer'
+import StreamModal from '@components/StreamModal'
 import ErrorPage from '@pages/Error'
+
+const BACKEND_URL = 'http://localhost:8000'
 
 const Details = ({ type }) => {
 	const params = useParams()
@@ -48,12 +52,111 @@ const Details = ({ type }) => {
 
 	const { videoIsVisible, videoHandler, closeVideoHandler } = useVideo()
 
-	const customMovie = findMovieByTmdbId(id)
+	const [playerVisible, setPlayerVisible] = useState(false)
+	const [playerStreams, setPlayerStreams] = useState([])
+	const [playerTitle, setPlayerTitle] = useState('')
+	const [playerLoading, setPlayerLoading] = useState(false)
+	const [streamModalOpen, setStreamModalOpen] = useState(false)
 
-	const playHandler = () => {
-		if (customMovie) {
-			window.open(getPlayerUrl(customMovie), '_blank')
+	const prefetchedStreams = useRef(null)
+	const prefetchStatus = useRef('idle')
+
+	const mediaType = type === 'tv' ? 'series' : 'movie'
+
+	useEffect(() => {
+		if (mediaType !== 'movie' || !id) return
+		if (prefetchStatus.current !== 'idle') return
+
+		prefetchStatus.current = 'loading'
+		fetch(`${BACKEND_URL}/api/streams/movie/${id}`)
+			.then(r => r.json())
+			.then(result => {
+				if (result.streams?.length > 0) {
+					prefetchedStreams.current = result.streams.map(s => ({
+						url: `${BACKEND_URL}${s.url}`,
+						label: s.description,
+						lang: s.lang,
+					}))
+				}
+				prefetchStatus.current = 'done'
+			})
+			.catch(() => {
+				prefetchStatus.current = 'done'
+			})
+
+		return () => {
+			prefetchedStreams.current = null
+			prefetchStatus.current = 'idle'
 		}
+	}, [id, mediaType])
+
+	const playHandler = useCallback(async () => {
+		if (mediaType === 'series') {
+			setStreamModalOpen(true)
+			return
+		}
+
+		setPlayerTitle(data?.title || '')
+		setPlayerVisible(true)
+
+		if (prefetchedStreams.current) {
+			setPlayerStreams(prefetchedStreams.current)
+			setPlayerLoading(false)
+			return
+		}
+
+		setPlayerLoading(true)
+		setPlayerStreams([])
+
+		const waitForPrefetch = () => new Promise(resolve => {
+			const check = () => {
+				if (prefetchStatus.current === 'done') {
+					resolve(prefetchedStreams.current)
+				} else {
+					setTimeout(check, 200)
+				}
+			}
+			check()
+		})
+
+		try {
+			const streams = await waitForPrefetch()
+			if (streams) {
+				setPlayerStreams(streams)
+			}
+		} catch {
+			setPlayerStreams([])
+		}
+		setPlayerLoading(false)
+	}, [id, mediaType, data])
+
+	const handleSeriesPlay = useCallback(async (season, episode) => {
+		setStreamModalOpen(false)
+		setPlayerVisible(true)
+		setPlayerLoading(true)
+		setPlayerTitle(`${data?.title || ''} - T${season}:E${episode}`)
+		setPlayerStreams([])
+
+		try {
+			const resp = await fetch(`${BACKEND_URL}/api/streams/series/${id}/${season}/${episode}`)
+			const result = await resp.json()
+			if (result.streams?.length > 0) {
+				setPlayerStreams(result.streams.map(s => ({
+					url: `${BACKEND_URL}${s.url}`,
+					label: s.description,
+					lang: s.lang,
+				})))
+			}
+		} catch {
+			setPlayerStreams([])
+		}
+		setPlayerLoading(false)
+	}, [id, data])
+
+	const closePlayer = () => {
+		setPlayerVisible(false)
+		setPlayerStreams([])
+		setPlayerLoading(false)
 	}
 
 	return (
@@ -68,7 +171,7 @@ const Details = ({ type }) => {
 						<Wrapper>
 							<DetailLogo data={data} logo={detailsInfo.logoUrl} />
 							<Controls
-								onPlay={customMovie ? playHandler : undefined}
+								onPlay={playHandler}
 								onVideoHandle={videoHandler}
 								isAddedToWatchList={isAddedToWatchList}
 								onRemove={removeFromWatchListHandler}
@@ -85,9 +188,30 @@ const Details = ({ type }) => {
 					</MotionContainer>
 
 					{videoIsVisible && <VideoPlayer onClick={closeVideoHandler} videoUrl={detailsInfo.videoUrl} />}
+
+					{mediaType === 'series' && (
+						<StreamModal
+							isOpen={streamModalOpen}
+							onClose={() => setStreamModalOpen(false)}
+							onPlay={handleSeriesPlay}
+							tmdbId={id}
+							mediaType={mediaType}
+							title={data.title}
+							numberOfSeasons={detailsInfo.numberOfSeasons}
+						/>
+					)}
+
+					{playerVisible && (
+						<NetflixPlayer
+							streams={playerStreams}
+							title={playerTitle}
+							onClose={closePlayer}
+							isLoadingStreams={playerLoading}
+						/>
+					)}
 				</>
 			)}
-			{!data && <ErrorPage />}
+			{!data && !isPending && <ErrorPage />}
 		</StyledContainer>
 	)
 }
