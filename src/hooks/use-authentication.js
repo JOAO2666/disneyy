@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import { userActions } from '@store/slices/user-slice'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { auth } from '@/firebase'
+import { t } from '@utils/i18n/i18n'
 
 const useAuthentication = () => {
 	const navigate = useNavigate()
@@ -22,7 +23,7 @@ const useAuthentication = () => {
 		} catch (error) {
 			console.error(error)
 			if (error.code === 'auth/invalid-credential') {
-				errorText = 'Invalid password or email. Please try again.'
+				errorText = t('auth.invalidCredentials')
 				setError(errorText)
 
 				localStorage.setItem('signUpEmail', data.email)
@@ -51,7 +52,7 @@ const useAuthentication = () => {
 		} catch (error) {
 			console.error(error)
 			if (error.code === 'auth/email-already-in-use') {
-				errorText = 'This email is already in use. Please sign in.'
+				errorText = t('auth.emailInUse')
 				setError(errorText)
 
 				localStorage.setItem('signInEmail', data.email)

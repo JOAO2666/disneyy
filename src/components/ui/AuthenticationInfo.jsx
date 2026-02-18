@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
+import { t } from '@utils/i18n/i18n'
 
 const AuthenticationInfo = ({ isSignin }) => {
 	return (
 		<InfoText>
-			{isSignin ? 'New to Disney Plus?' : 'Already on Disney Plus?'}
+			{isSignin ? t('auth.newToDisney') : t('auth.alreadyOnDisney')}
 			<Link to={`${isSignin ? '/disney-plus-clone/signup' : '/disney-plus-clone/signin'}`}>
-				<span>{isSignin ? 'Sign up now' : 'Sign in'}</span>
+				<span>{isSignin ? t('auth.signUpNow') : t('auth.signIn')}</span>
 			</Link>
 		</InfoText>
 	)

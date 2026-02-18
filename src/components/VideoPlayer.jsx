@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import { OpacityMotionContainer } from '@components/ui/MotionContainer'
 import ReactPlayer from 'react-player'
+import { t } from '@utils/i18n/i18n'
 
 const VideoPlayer = ({ onClick, videoUrl }) => {
 	return (
@@ -8,7 +9,7 @@ const VideoPlayer = ({ onClick, videoUrl }) => {
 			<OpacityMotionContainer>
 				<>
 					{videoUrl && <ReactPlayer width='70vw' height='50vh' url={videoUrl} controls={true} />}
-					{!videoUrl && <p>Unfortunately no trailer has been provided for this resource.</p>}
+					{!videoUrl && <p>{t('errors.noTrailer')}</p>}
 				</>
 			</OpacityMotionContainer>
 		</VideoWrapper>
@@ -27,5 +28,5 @@ const VideoWrapper = styled.div`
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	z-index: 1;
+	z-index: 9999;
 `

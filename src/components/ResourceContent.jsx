@@ -4,12 +4,13 @@ import GridContainer from '@components/ui/GridContainer'
 import { OpacityMotionContainer } from '@components/ui/MotionContainer'
 import Loader from '@components/ui/Loader'
 import ErrorBlock from '@components/ui/ErrorBlock'
+import { t } from '@utils/i18n/i18n'
 
 const ResourceContent = ({ isPending, isError, isSuccess, data, resourceList, type }) => (
 	<>
 		{isPending && <Loader />}
-		{isError && <ErrorBlock message='Something went wrong, please try again later.' />}
-		{isSuccess && !data.length && <p>No data available for the selected category.</p>}
+		{isError && <ErrorBlock message={t('errors.somethingWrong')} />}
+		{isSuccess && !data.length && <p>{t('errors.noData')}</p>}
 		{isSuccess && data.length > 0 && (
 			<OpacityMotionContainer>
 				<GridContainer movies={resourceList} path={type} />

@@ -6,16 +6,17 @@ import IconButton from '@mui/material/IconButton'
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded'
 import DoneRoundedIcon from '@mui/icons-material/DoneRounded'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
+import { t } from '@utils/i18n/i18n'
 
-const Controls = ({ onVideoHandle, isAddedToWatchList, onRemove, onAdd }) => {
+const Controls = ({ onPlay, onVideoHandle, isAddedToWatchList, onRemove, onAdd }) => {
 	return (
 		<StyledControls>
-			<StyledButton className='play' variant='contained' startIcon={<PlayArrowRoundedIcon />}>
-				PLAY
+			<StyledButton className='play' variant='contained' startIcon={<PlayArrowRoundedIcon />} onClick={onPlay}>
+				{t('controls.play')}
 			</StyledButton>
 
 			<StyledButton onClick={onVideoHandle} className='trailer' variant='outlined' startIcon={<PlayArrowRoundedIcon />}>
-				TRAILER
+				{t('controls.trailer')}
 			</StyledButton>
 
 			{isAddedToWatchList && (

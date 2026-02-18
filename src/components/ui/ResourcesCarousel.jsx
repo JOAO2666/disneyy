@@ -10,6 +10,7 @@ import Loader from '@components/ui/Loader'
 import ErrorBlock from '@components/ui/ErrorBlock'
 import { MotionContainer } from '@components/ui/MotionContainer'
 import ItemContainer from '@components/ui/ItemContainer'
+import { t } from '@utils/i18n/i18n'
 
 const ResourcesCarousel = ({ data, isPending, isError }) => {
 	const [slidesToShow, setSlidesToShow] = useState(2)
@@ -57,7 +58,7 @@ const ResourcesCarousel = ({ data, isPending, isError }) => {
 			<MotionContainer delay={1}>
 				<>
 					{isPending && <Loader />}
-					{isError && <ErrorBlock message='Something went wrong, please try again later.' />}
+					{isError && <ErrorBlock message={t('errors.somethingWrong')} />}
 					{data &&
 						data.map(category => {
 							return (
@@ -74,7 +75,7 @@ const ResourcesCarousel = ({ data, isPending, isError }) => {
 											))}
 										</StyledCarousel>
 									)}
-									{!category.data && <ErrorBlock message={`Failed to fetch ${category.title} data, please try again later.`} />}
+									{!category.data && <ErrorBlock message={`${t('errors.failedToFetch')} ${category.title} ${t('errors.dataPleaseTry')}`} />}
 								</div>
 							)
 						})}

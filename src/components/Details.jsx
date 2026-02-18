@@ -8,10 +8,12 @@ import useScroll from '@hooks/use-scroll'
 import { detailsData } from '@utils/details/details-data'
 import useDetail from '@hooks/use-detail'
 import useVideo from '@hooks/use-video'
+import { findMovieByTmdbId, getPlayerUrl } from '@utils/custom-movies'
 
 import Container from '@components/ui/Container'
 import Loader from '@components/ui/Loader'
 import ErrorBlock from '@components/ui/ErrorBlock'
+import { t } from '@utils/i18n/i18n'
 import DetailBackgroundImage from '@components/ui/DetailBackgroundImage'
 import { MotionContainer } from '@components/ui/MotionContainer'
 import DetailLogo from '@components/ui/DetailLogo'
@@ -46,10 +48,18 @@ const Details = ({ type }) => {
 
 	const { videoIsVisible, videoHandler, closeVideoHandler } = useVideo()
 
+	const customMovie = findMovieByTmdbId(id)
+
+	const playHandler = () => {
+		if (customMovie) {
+			window.open(getPlayerUrl(customMovie), '_blank')
+		}
+	}
+
 	return (
 		<StyledContainer>
 			{isPending && <Loader />}
-			{isError && <ErrorBlock message='Something went wrong, please try again later.' />}
+			{isError && <ErrorBlock message={t('errors.somethingWrong')} />}
 			{data && (
 				<>
 					<DetailBackgroundImage backdropUrl={detailsInfo.backdropUrl} title={data.title} />
@@ -58,6 +68,7 @@ const Details = ({ type }) => {
 						<Wrapper>
 							<DetailLogo data={data} logo={detailsInfo.logoUrl} />
 							<Controls
+								onPlay={customMovie ? playHandler : undefined}
 								onVideoHandle={videoHandler}
 								isAddedToWatchList={isAddedToWatchList}
 								onRemove={removeFromWatchListHandler}

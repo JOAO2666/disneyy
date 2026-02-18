@@ -10,6 +10,7 @@ import { OpacityMotionContainer } from '@components/ui/MotionContainer'
 import GridContainer from '@components/ui/GridContainer'
 import Loader from '@components/ui/Loader'
 import ErrorBlock from '@components/ui/ErrorBlock'
+import { t } from '@utils/i18n/i18n'
 
 const CollectionResourcesPage = () => {
 	const params = useParams()
@@ -23,7 +24,7 @@ const CollectionResourcesPage = () => {
 	return (
 		<StyledContainer>
 			{isPending && <Loader />}
-			{isError && <ErrorBlock message='Something went wrong, please try again later.' />}
+			{isError && <ErrorBlock message={t('errors.somethingWrong')} />}
 			{data && (
 				<OpacityMotionContainer>
 					<GridContainer movies={data} path={mediaType} title={collectionHeader} />

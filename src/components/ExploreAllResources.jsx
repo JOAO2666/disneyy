@@ -8,6 +8,7 @@ import Container from '@components/ui/Container'
 import GridContainer from '@components/ui/GridContainer'
 import Loader from '@components/ui/Loader'
 import ErrorBlock from '@components/ui/ErrorBlock'
+import { t } from '@utils/i18n/i18n'
 
 const ExploreAllResources = () => {
 	const { data, isPending, isError } = useQuery({
@@ -29,8 +30,8 @@ const ExploreAllResources = () => {
 		<OpacityMotionContainer>
 			<StyledContainer>
 				{isPending && <Loader />}
-				{isError && <ErrorBlock message='Something went wrong, please try again later.' />}
-				{data && <GridContainer movies={allMovies} title='Explore' path='movie' />}
+				{isError && <ErrorBlock message={t('errors.somethingWrong')} />}
+				{data && <GridContainer movies={allMovies} title={t('explore.title')} path='movie' />}
 			</StyledContainer>
 		</OpacityMotionContainer>
 	)

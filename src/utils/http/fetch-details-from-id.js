@@ -1,8 +1,12 @@
 import { BASE_URL, API_KEY } from '@utils/http/constants'
+import { getLang } from '@utils/i18n/i18n'
+
+const langMap = { en: 'en-US', pt: 'pt-BR', es: 'es-ES', fr: 'fr-FR' }
 
 export const fetchDetailsFromId = async ({ signal, detailsId, resourceType }) => {
+	const tmdbLang = langMap[getLang()] || 'en-US'
 	try {
-		const response = await fetch(`${BASE_URL}/${resourceType}/${detailsId}?api_key=${API_KEY}&append_to_response=videos,images`, {
+		const response = await fetch(`${BASE_URL}/${resourceType}/${detailsId}?api_key=${API_KEY}&language=${tmdbLang}&append_to_response=videos,images&include_image_language=en,null&include_video_language=en,pt,es,fr,null`, {
 			signal,
 		})
 

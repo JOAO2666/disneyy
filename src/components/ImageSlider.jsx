@@ -72,3 +72,4 @@ const OverlayImage = styled.div`
 		transform: translateX(-2%);
 	}
 `
+

@@ -6,6 +6,7 @@ import disneyAppLogo from '@images/disney-logo.svg'
 import MobileMenuContent from '@components/layout/navigation/MobileMenuContent'
 import DesktopMenuContent from '@components/layout/navigation/DesktopMenuContent'
 import ProfileContent from '@components/layout/navigation/ProfileContent'
+import { t } from '@utils/i18n/i18n'
 
 const MainNavigation = () => {
 	const { anchorEl, setAnchorEl, handleCloseNavMenu, handleOpenNavMenu, user, signoutHandler } = useNavigation()
@@ -20,7 +21,7 @@ const MainNavigation = () => {
 
 					{user === null && (
 						<Link to='/disney-plus-clone/signin'>
-							<StyledButton variant='outlined'>GET STARTED</StyledButton>
+							<StyledButton variant='outlined'>{t('nav.getStarted')}</StyledButton>
 						</Link>
 					)}
 					{user !== null && (

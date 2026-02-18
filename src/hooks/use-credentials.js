@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { t } from '@utils/i18n/i18n'
 
 const useCredentials = ({ mode, onSignin, onSignup }) => {
 	const isSignin = mode == 'signin'
@@ -64,15 +65,15 @@ const useCredentials = ({ mode, onSignin, onSignup }) => {
 
 		if (!isSignin) {
 			if (userName.trim() === '') {
-				setUserNameError('Username cannot be empty.')
+				setUserNameError(t('auth.usernameEmpty'))
 			} else if (userName.trim().length > maxUserNameCharactersAmount) {
-				setUserNameError('Username cannot be longer than 10 characters.')
+				setUserNameError(t('auth.usernameTooLong'))
 			} else {
 				setUserNameError('')
 			}
 
 			if (password.length < minPasswordLength) {
-				setPasswordError('Password must be at least 6 characters long.')
+				setPasswordError(t('auth.passwordTooShort'))
 			} else {
 				setPasswordError('')
 			}

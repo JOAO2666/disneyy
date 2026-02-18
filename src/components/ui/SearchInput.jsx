@@ -4,6 +4,7 @@ import { styled as styledMUI } from '@mui/system'
 
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import InputBase from '@mui/material/InputBase'
+import { t } from '@utils/i18n/i18n'
 
 const SearchInput = ({ onChange, query }) => {
 	return (
@@ -13,8 +14,8 @@ const SearchInput = ({ onChange, query }) => {
 				id='searchInput'
 				value={query}
 				onChange={onChange}
-				placeholder='Search for movies or series...'
-				inputProps={{ 'aria-label': 'Search for movies or series' }}
+				placeholder={t('search.placeholder')}
+				inputProps={{ 'aria-label': t('search.placeholder') }}
 				fullWidth
 			/>
 		</SearchContainer>

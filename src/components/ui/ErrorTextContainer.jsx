@@ -3,14 +3,15 @@ import styled from 'styled-components'
 import { styled as styledMUI } from '@mui/system'
 
 import Button from '@mui/material/Button'
+import { t } from '@utils/i18n/i18n'
 
 const ErrorTextContainer = () => {
 	return (
 		<Container>
-			<h1>OOPS! PAGE NOT FOUND.</h1>
-			<p>You must have picked the wrong door because we have not been able to lay our eyes on the page you are searching for.</p>
+			<h1>{t('errors.pageNotFound')}</h1>
+			<p>{t('errors.pageNotFoundDesc')}</p>
 			<Link to='/disney-plus-clone/'>
-				<StyledButton variant='contained'>BACK TO HOME</StyledButton>
+				<StyledButton variant='contained'>{t('errors.backToHome')}</StyledButton>
 			</Link>
 		</Container>
 	)

@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { t } from '@utils/i18n/i18n'
 
 const AuthenticationInputBox = ({
 	isSignin,
@@ -16,13 +17,13 @@ const AuthenticationInputBox = ({
 		<InputBox>
 			{!isSignin && (
 				<div>
-					<InputField type='name' name='username' placeholder='Username' value={userName} onChange={userNameChangeHandler} required />
+					<InputField type='name' name='username' placeholder={t('auth.username')} value={userName} onChange={userNameChangeHandler} required />
 					{userNameError ? <Error>{userNameError}</Error> : ''}
 				</div>
 			)}
-			<InputField type='email' name='email' placeholder='Email' value={email} onChange={emailChangeHandler} required />
+			<InputField type='email' name='email' placeholder={t('auth.email')} value={email} onChange={emailChangeHandler} required />
 			<div>
-				<InputField type='password' name='password' placeholder='Password' value={password} onChange={passwordChangeHandler} required />
+				<InputField type='password' name='password' placeholder={t('auth.password')} value={password} onChange={passwordChangeHandler} required />
 				{passwordError ? <Error>{passwordError}</Error> : ''}
 				{error ? <Error>{error}</Error> : ''}
 			</div>

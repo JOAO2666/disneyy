@@ -1,6 +1,10 @@
 import { BASE_URL, API_KEY } from '@utils/http/constants'
+import { getLang } from '@utils/i18n/i18n'
+
+const langMap = { en: 'en-US', pt: 'pt-BR', es: 'es-ES', fr: 'fr-FR' }
 
 export const fetchListForCategory = async ({ signal, resourceType, category }) => {
+	const tmdbLang = langMap[getLang()] || 'en-US'
 	try {
 		const endpoint = resourceType === 'movie' ? 'discover/movie' : resourceType === 'series' ? 'discover/tv' : null
 
@@ -8,7 +12,7 @@ export const fetchListForCategory = async ({ signal, resourceType, category }) =
 			throw new Error('Invalid type.')
 		}
 
-		const response = await fetch(`${BASE_URL}/${endpoint}?with_watch_providers=337&with_genres=${category}&api_key=${API_KEY}`, {
+		const response = await fetch(`${BASE_URL}/${endpoint}?with_watch_providers=337&with_genres=${category}&language=${tmdbLang}&api_key=${API_KEY}`, {
 			signal,
 		})
 

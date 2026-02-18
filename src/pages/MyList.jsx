@@ -5,18 +5,19 @@ import Container from '@components/ui/Container'
 import { OpacityMotionContainer } from '@components/ui/MotionContainer'
 import GridContainer from '@components/ui/GridContainer'
 import Title from '@components/ui/Title'
+import { t } from '@utils/i18n/i18n'
 
 const MyListPage = () => {
 	const resourceArray = useWatchList()
 
 	return (
 		<StyledContainer>
-			<Title>My List</Title>
+			<Title>{t('myList.title')}</Title>
 			<OpacityMotionContainer>
 				<Wrapper>
 					{resourceArray.length > 0 && <GridContainer movies={resourceArray} />}
 					{resourceArray.length === 0 && (
-						<InfoParagraph>{`Your watch list is empty. Why don't you add something in here? 💫`}</InfoParagraph>
+						<InfoParagraph>{t('myList.empty')}</InfoParagraph>
 					)}
 				</Wrapper>
 			</OpacityMotionContainer>

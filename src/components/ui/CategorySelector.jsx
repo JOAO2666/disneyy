@@ -1,10 +1,12 @@
 import styled from 'styled-components'
 import Title from '@components/ui/Title'
+import { t } from '@utils/i18n/i18n'
 
 const CategorySelector = ({ type, selectedCategory, onChange, categoryOptions }) => {
+	const typeLabel = type === 'movie' ? t('nav.movies').toLowerCase() : t('nav.series').toLowerCase()
 	return (
 		<Wrapper>
-			<StyledTitle>Select your favorite {type} category:</StyledTitle>
+			<StyledTitle>{t('explore.selectCategory')} {typeLabel}{t('explore.categoryLabel')}</StyledTitle>
 			<StyledSelect id='category-selection' value={selectedCategory} onChange={onChange} className='select'>
 				{categoryOptions[type].map(category => (
 					<option key={category.id} value={category.id}>

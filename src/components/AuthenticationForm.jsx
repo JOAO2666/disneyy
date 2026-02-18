@@ -7,6 +7,7 @@ import Container from '@components/ui/Container'
 import useCredentials from '@hooks/use-credentials'
 import AuthenticationInfo from '@components/ui/AuthenticationInfo'
 import AuthenticationInputBox from '@components/ui/AuthenticationInputBox'
+import { t } from '@utils/i18n/i18n'
 
 const AuthenticationForm = ({ mode, onSignin, onSignup, error }) => {
 	const {
@@ -27,7 +28,7 @@ const AuthenticationForm = ({ mode, onSignin, onSignup, error }) => {
 			<AuthenticationBox>
 				<Logo src={disneyAppLogo} alt='Logo of Disney+ App' />
 				<form onSubmit={submitHandler}>
-					<FormHeader>{isSignin ? 'Sign in' : 'Sign up'}</FormHeader>
+					<FormHeader>{isSignin ? t('auth.signIn') : t('auth.signUp')}</FormHeader>
 					<AuthenticationInputBox
 						isSignin={isSignin}
 						userName={userName}
@@ -40,7 +41,7 @@ const AuthenticationForm = ({ mode, onSignin, onSignup, error }) => {
 						passwordError={passwordError}
 						error={error}
 					/>
-					<SubmitButton type='submit'>{isSignin ? 'Sign in' : 'Sign up'}</SubmitButton>
+					<SubmitButton type='submit'>{isSignin ? t('auth.signIn') : t('auth.signUp')}</SubmitButton>
 				</form>
 			</AuthenticationBox>
 			<AuthenticationInfo isSignin={isSignin} />

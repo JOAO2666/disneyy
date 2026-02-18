@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 
 import disneyLogo from '@images/disney-logo.svg'
+import { t } from '@utils/i18n/i18n'
 
 const Footer = () => {
 	const currentYear = new Date().getFullYear()
@@ -10,7 +11,7 @@ const Footer = () => {
 			<Wrapper>
 				<StyledLogo src={disneyLogo} alt='Logo of Disney+ App'></StyledLogo>
 				<StyledParagraph>
-					&copy; {currentYear}, coded by <a href='https://github.com/mkwiecien00'>Małgorzata Kwiecień</a>
+					&copy; {currentYear}, {t('footer.codedBy')} <a href='https://github.com/mkwiecien00'>Małgorzata Kwiecień</a>
 				</StyledParagraph>
 			</Wrapper>
 		</StyledFooter>

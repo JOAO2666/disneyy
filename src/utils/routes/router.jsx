@@ -13,6 +13,7 @@ import DiscoverSeriesPage from '@pages/DiscoverSeries'
 import MyListPage from '@pages/MyList'
 import SignInPage from '@pages/SignIn'
 import SignUpPage from '@pages/SignUp'
+import CustomMovieDetails from '@pages/CustomMovieDetails'
 
 export const router = createBrowserRouter([
 	{
@@ -39,6 +40,10 @@ export const router = createBrowserRouter([
 							{ index: true, element: <DiscoverSeriesPage /> },
 							{ path: ':id', element: <SeriesDetailsPage /> },
 						],
+					},
+					{
+						path: 'watch/:id',
+						element: <CustomMovieDetails />,
 					},
 					{
 						path: 'search',
