@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import PropTypes from 'prop-types'
@@ -22,11 +22,10 @@ import DetailParagraph from '@components/ui/DetailParagraph'
 import DetailDescription from '@components/ui/DetailDescription'
 import BackButton from '@components/ui/BackButton'
 import VideoPlayer from '@components/VideoPlayer'
-import NetflixPlayer from '@components/NetflixPlayer'
+import WebtorPlayer from '@components/WebtorPlayer'
 import StreamModal from '@components/StreamModal'
+import StreamSelectionModal from '@components/StreamSelectionModal'
 import ErrorPage from '@pages/Error'
-
-const BACKEND_URL = 'http://localhost:8000'
 
 const Details = ({ type }) => {
 	const params = useParams()
@@ -52,111 +51,58 @@ const Details = ({ type }) => {
 
 	const { videoIsVisible, videoHandler, closeVideoHandler } = useVideo()
 
+	// Player state
 	const [playerVisible, setPlayerVisible] = useState(false)
 	const [playerStreams, setPlayerStreams] = useState([])
 	const [playerTitle, setPlayerTitle] = useState('')
-	const [playerLoading, setPlayerLoading] = useState(false)
-	const [streamModalOpen, setStreamModalOpen] = useState(false)
 
-	const prefetchedStreams = useRef(null)
-	const prefetchStatus = useRef('idle')
+	// Stream selection modal state
+	const [streamSelectionOpen, setStreamSelectionOpen] = useState(false)
+	const [streamSelectionSeason, setStreamSelectionSeason] = useState(null)
+	const [streamSelectionEpisode, setStreamSelectionEpisode] = useState(null)
+
+	// Series season/episode picker state
+	const [streamModalOpen, setStreamModalOpen] = useState(false)
 
 	const mediaType = type === 'tv' ? 'series' : 'movie'
 
-	useEffect(() => {
-		if (mediaType !== 'movie' || !id) return
-		if (prefetchStatus.current !== 'idle') return
-
-		prefetchStatus.current = 'loading'
-		fetch(`${BACKEND_URL}/api/streams/movie/${id}`)
-			.then(r => r.json())
-			.then(result => {
-				if (result.streams?.length > 0) {
-					prefetchedStreams.current = result.streams.map(s => ({
-						url: `${BACKEND_URL}${s.url}`,
-						label: s.description,
-						lang: s.lang,
-					}))
-				}
-				prefetchStatus.current = 'done'
-			})
-			.catch(() => {
-				prefetchStatus.current = 'done'
-			})
-
-		return () => {
-			prefetchedStreams.current = null
-			prefetchStatus.current = 'idle'
-		}
-	}, [id, mediaType])
-
-	const playHandler = useCallback(async () => {
+	// ── Click "Assistir" ────────────────────────────────────────────────────
+	const playHandler = useCallback(() => {
 		if (mediaType === 'series') {
+			// Séries: primeiro escolher temporada/episódio
 			setStreamModalOpen(true)
-			return
+		} else {
+			// Filmes: abrir modal de seleção de stream direto
+			setStreamSelectionSeason(null)
+			setStreamSelectionEpisode(null)
+			setStreamSelectionOpen(true)
 		}
+	}, [mediaType])
 
-		setPlayerTitle(data?.title || '')
-		setPlayerVisible(true)
-
-		if (prefetchedStreams.current) {
-			setPlayerStreams(prefetchedStreams.current)
-			setPlayerLoading(false)
-			return
-		}
-
-		setPlayerLoading(true)
-		setPlayerStreams([])
-
-		const waitForPrefetch = () => new Promise(resolve => {
-			const check = () => {
-				if (prefetchStatus.current === 'done') {
-					resolve(prefetchedStreams.current)
-				} else {
-					setTimeout(check, 200)
-				}
-			}
-			check()
-		})
-
-		try {
-			const streams = await waitForPrefetch()
-			if (streams) {
-				setPlayerStreams(streams)
-			}
-		} catch {
-			setPlayerStreams([])
-		}
-		setPlayerLoading(false)
-	}, [id, mediaType, data])
-
-	const handleSeriesPlay = useCallback(async (season, episode) => {
+	// ── Series: após escolher episódio, mostrar streams ─────────────────────
+	const handleSeriesEpisodeSelected = useCallback((season, episode) => {
 		setStreamModalOpen(false)
-		setPlayerVisible(true)
-		setPlayerLoading(true)
-		setPlayerTitle(`${data?.title || ''} - T${season}:E${episode}`)
-		setPlayerStreams([])
+		setStreamSelectionSeason(season)
+		setStreamSelectionEpisode(episode)
+		setStreamSelectionOpen(true)
+	}, [])
 
-		try {
-			const resp = await fetch(`${BACKEND_URL}/api/streams/series/${id}/${season}/${episode}`)
-			const result = await resp.json()
-			if (result.streams?.length > 0) {
-				setPlayerStreams(result.streams.map(s => ({
-					url: `${BACKEND_URL}${s.url}`,
-					label: s.description,
-					lang: s.lang,
-				})))
-			}
-		} catch {
-			setPlayerStreams([])
-		}
-		setPlayerLoading(false)
-	}, [id, data])
+	// ── User escolheu um stream → reproduzir ───────────────────────────────
+	const handleStreamSelected = useCallback((stream) => {
+		setStreamSelectionOpen(false)
+
+		const episodeLabel = streamSelectionSeason && streamSelectionEpisode
+			? ` - T${streamSelectionSeason}:E${streamSelectionEpisode}`
+			: ''
+
+		setPlayerTitle(`${data?.title || ''}${episodeLabel}`)
+		setPlayerStreams([stream])
+		setPlayerVisible(true)
+	}, [data, streamSelectionSeason, streamSelectionEpisode])
 
 	const closePlayer = () => {
 		setPlayerVisible(false)
 		setPlayerStreams([])
-		setPlayerLoading(false)
 	}
 
 	return (
@@ -189,11 +135,12 @@ const Details = ({ type }) => {
 
 					{videoIsVisible && <VideoPlayer onClick={closeVideoHandler} videoUrl={detailsInfo.videoUrl} />}
 
+					{/* Modal de temporada/episódio para séries */}
 					{mediaType === 'series' && (
 						<StreamModal
 							isOpen={streamModalOpen}
 							onClose={() => setStreamModalOpen(false)}
-							onPlay={handleSeriesPlay}
+							onPlay={handleSeriesEpisodeSelected}
 							tmdbId={id}
 							mediaType={mediaType}
 							title={data.title}
@@ -201,12 +148,26 @@ const Details = ({ type }) => {
 						/>
 					)}
 
+					{/* Modal de seleção de stream (estilo Stremio) */}
+					<StreamSelectionModal
+						isOpen={streamSelectionOpen}
+						onClose={() => setStreamSelectionOpen(false)}
+						onSelectStream={handleStreamSelected}
+						tmdbId={id}
+						mediaType={mediaType}
+						title={data.title}
+						season={streamSelectionSeason}
+						episode={streamSelectionEpisode}
+						imdbId={data.imdb_id}
+					/>
+
+					{/* Player webtor.io */}
 					{playerVisible && (
-						<NetflixPlayer
+						<WebtorPlayer
 							streams={playerStreams}
 							title={playerTitle}
+							poster={detailsInfo.backdropUrl}
 							onClose={closePlayer}
-							isLoadingStreams={playerLoading}
 						/>
 					)}
 				</>

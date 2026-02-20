@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { ProtectedRoutes } from '@utils/routes/protected-routes'
 
 import RootLayout from '@pages/Root'
@@ -16,6 +16,7 @@ import SignUpPage from '@pages/SignUp'
 import CustomMovieDetails from '@pages/CustomMovieDetails'
 
 export const router = createBrowserRouter([
+	{ path: '/', element: <Navigate to="/disney-plus-clone/" replace /> },
 	{
 		path: '/disney-plus-clone/',
 		element: <RootLayout />,

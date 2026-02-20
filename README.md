@@ -6,7 +6,7 @@
     <br />
     <a href="https://disney-plus-joao2666.netlify.app">Ver Demo</a>
     ·
-    <a href="https://github.com/JOAO2666/Disney">Explorar Documentação</a>
+    <a href="https://github.com/JOAO2666/disneyy">Explorar Documentação</a>
 </div>
 
 <details open="open">

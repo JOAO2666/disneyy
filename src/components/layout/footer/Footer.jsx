@@ -11,7 +11,7 @@ const Footer = () => {
 			<Wrapper>
 				<StyledLogo src={disneyLogo} alt='Logo of Disney+ App'></StyledLogo>
 				<StyledParagraph>
-					&copy; {currentYear}, {t('footer.codedBy')} <a href='https://github.com/mkwiecien00'>Małgorzata Kwiecień</a>
+					&copy; {currentYear}, {t('footer.codedBy')} <a href='https://github.com/JOAO2666'>João Emanuel</a>
 				</StyledParagraph>
 			</Wrapper>
 		</StyledFooter>
