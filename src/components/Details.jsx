@@ -1,8 +1,9 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { useSelector } from 'react-redux'
 
 import { fetchDetailsFromId } from '@utils/http/fetch-details-from-id'
 import useScroll from '@hooks/use-scroll'
@@ -22,7 +23,7 @@ import DetailParagraph from '@components/ui/DetailParagraph'
 import DetailDescription from '@components/ui/DetailDescription'
 import BackButton from '@components/ui/BackButton'
 import VideoPlayer from '@components/VideoPlayer'
-import WebtorPlayer from '@components/WebtorPlayer'
+import UnifiedPlayer from '@components/UnifiedPlayer'
 import StreamModal from '@components/StreamModal'
 import StreamSelectionModal from '@components/StreamSelectionModal'
 import ErrorPage from '@pages/Error'
@@ -64,23 +65,89 @@ const Details = ({ type }) => {
 	// Series season/episode picker state
 	const [streamModalOpen, setStreamModalOpen] = useState(false)
 
+	// Playback progress persistence
+	const user = useSelector(state => state.user.user)
+	const uid = user?.uid
+	const [savedProgress, setSavedProgress] = useState(null)
+	const [initialSeekTime, setInitialSeekTime] = useState(0)
+
 	const mediaType = type === 'tv' ? 'series' : 'movie'
 
-	// ── Click "Assistir" ────────────────────────────────────────────────────
+	// Fetch progress from Firebase Database
+	const fetchProgress = useCallback(async () => {
+		if (!uid || !id) return
+		try {
+			const response = await fetch(`https://disney-plus-mk-default-rtdb.firebaseio.com/playback-progress/${uid}/${id}.json`)
+			if (response.ok) {
+				const data = await response.json()
+				if (data && data.currentTime > 0) {
+					// If the user watched more than 95%, don't offer to resume
+					if (data.duration && data.currentTime / data.duration > 0.95) {
+						setSavedProgress(null)
+					} else {
+						setSavedProgress(data)
+					}
+				} else {
+					setSavedProgress(null)
+				}
+			}
+		} catch (e) {
+			console.warn('Error fetching saved progress:', e)
+		}
+	}, [uid, id])
+
+	useEffect(() => {
+		fetchProgress()
+	}, [fetchProgress])
+
+	const formatProgressTime = (timeInSeconds) => {
+		if (isNaN(timeInSeconds)) return '00:00'
+		const minutes = Math.floor(timeInSeconds / 60)
+		const seconds = Math.floor(timeInSeconds % 60)
+		return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+	}
+
+	const getResumeLabel = () => {
+		if (!savedProgress) return ''
+		if (mediaType === 'series' && savedProgress.season && savedProgress.episode) {
+			return `Continuar T${savedProgress.season}:E${savedProgress.episode}`
+		}
+		return `Continuar (${formatProgressTime(savedProgress.currentTime)})`
+	}
+
+	// ── Click "Assistir" (Play from start) ──────────────────────────────────
 	const playHandler = useCallback(() => {
+		setInitialSeekTime(0) // Start from beginning
 		if (mediaType === 'series') {
-			// Séries: primeiro escolher temporada/episódio
 			setStreamModalOpen(true)
 		} else {
-			// Filmes: abrir modal de seleção de stream direto
 			setStreamSelectionSeason(null)
 			setStreamSelectionEpisode(null)
 			setStreamSelectionOpen(true)
 		}
 	}, [mediaType])
 
+	// ── Click "Continuar Assistindo" (Resume from saved progress) ─────────────
+	const resumeHandler = useCallback(() => {
+		if (!savedProgress) return
+		setInitialSeekTime(savedProgress.currentTime)
+
+		if (mediaType === 'series' && savedProgress.season && savedProgress.episode) {
+			// Series: skip episode selector, open stream selection directly for that episode
+			setStreamSelectionSeason(savedProgress.season)
+			setStreamSelectionEpisode(savedProgress.episode)
+			setStreamSelectionOpen(true)
+		} else {
+			// Movies: open stream selection directly
+			setStreamSelectionSeason(null)
+			setStreamSelectionEpisode(null)
+			setStreamSelectionOpen(true)
+		}
+	}, [mediaType, savedProgress])
+
 	// ── Series: após escolher episódio, mostrar streams ─────────────────────
 	const handleSeriesEpisodeSelected = useCallback((season, episode) => {
+		setInitialSeekTime(0) // Selected a new episode, start from 0
 		setStreamModalOpen(false)
 		setStreamSelectionSeason(season)
 		setStreamSelectionEpisode(episode)
@@ -103,6 +170,7 @@ const Details = ({ type }) => {
 	const closePlayer = () => {
 		setPlayerVisible(false)
 		setPlayerStreams([])
+		fetchProgress() // Refresh database progress state on close
 	}
 
 	return (
@@ -122,6 +190,8 @@ const Details = ({ type }) => {
 								isAddedToWatchList={isAddedToWatchList}
 								onRemove={removeFromWatchListHandler}
 								onAdd={addToWatchListHandler}
+								onResume={savedProgress ? resumeHandler : null}
+								resumeLabel={savedProgress ? getResumeLabel() : ''}
 							/>
 							<DetailParagraph
 								releaseYear={detailsInfo.releaseYear}
@@ -161,12 +231,16 @@ const Details = ({ type }) => {
 						imdbId={data.imdb_id}
 					/>
 
-					{/* Player webtor.io */}
+					{/* Unified HLS & MP4 Online Player */}
 					{playerVisible && (
-						<WebtorPlayer
-							streams={playerStreams}
+						<UnifiedPlayer
+							stream={playerStreams[0]}
 							title={playerTitle}
-							poster={detailsInfo.backdropUrl}
+							tmdbId={id}
+							mediaType={mediaType}
+							season={streamSelectionSeason}
+							episode={streamSelectionEpisode}
+							initialTime={initialSeekTime}
 							onClose={closePlayer}
 						/>
 					)}
@@ -206,3 +280,4 @@ const Wrapper = styled.section`
 		margin: 0 100px;
 	}
 `
+

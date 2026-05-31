@@ -8,12 +8,18 @@ import DoneRoundedIcon from '@mui/icons-material/DoneRounded'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import { t } from '@utils/i18n/i18n'
 
-const Controls = ({ onPlay, onVideoHandle, isAddedToWatchList, onRemove, onAdd }) => {
+const Controls = ({ onPlay, onVideoHandle, isAddedToWatchList, onRemove, onAdd, onResume, resumeLabel }) => {
 	return (
 		<StyledControls>
 			<StyledButton className='play' variant='contained' startIcon={<PlayArrowRoundedIcon />} onClick={onPlay}>
 				{t('controls.play')}
 			</StyledButton>
+
+			{onResume && (
+				<StyledButton className='play resume' variant='contained' startIcon={<PlayArrowRoundedIcon />} onClick={onResume}>
+					{resumeLabel || 'Continuar'}
+				</StyledButton>
+			)}
 
 			<StyledButton onClick={onVideoHandle} className='trailer' variant='outlined' startIcon={<PlayArrowRoundedIcon />}>
 				{t('controls.trailer')}
@@ -40,6 +46,7 @@ const StyledControls = styled.div`
 	display: flex;
 	gap: 10px;
 	margin-bottom: 10px;
+	flex-wrap: wrap;
 `
 
 const StyledButton = styledMUI(Button)({
@@ -66,6 +73,19 @@ const StyledButton = styledMUI(Button)({
 		},
 	},
 
+	'&.resume': {
+		color: '#fff',
+		backgroundColor: '#0063e5',
+		width: 'auto',
+		paddingLeft: '20px',
+		paddingRight: '20px',
+
+		'&:hover': {
+			color: '#fff',
+			backgroundColor: '#0072ff',
+		},
+	},
+
 	'&.trailer': {
 		color: '#F9F6EE',
 		backgroundColor: 'rgba(0, 0, 0, 0.6)',
@@ -89,3 +109,4 @@ const StyledIconButton = styledMUI(IconButton)({
 		backgroundColor: '#000',
 	},
 })
+
