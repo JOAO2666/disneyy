@@ -35,6 +35,7 @@ const UnifiedPlayer = ({ stream, title, tmdbId, mediaType, season, episode, init
 	const [isLoading, setIsLoading] = useState(true)
 	const [isIdle, setIsIdle] = useState(false)
 	const [error, setError] = useState(null)
+	const [copied, setCopied] = useState(false)
 
 	const videoUrl = stream?.url || ''
 
@@ -214,6 +215,21 @@ const UnifiedPlayer = ({ stream, title, tmdbId, mediaType, season, episode, init
 		if (onClose) onClose()
 	}
 
+	// --- Alternate Playback Options (CORS bypass) ---
+	const handleOpenExternal = () => {
+		if (videoUrl) {
+			window.open(videoUrl, '_blank')
+		}
+	}
+
+	const handleCopyLink = () => {
+		if (videoUrl) {
+			navigator.clipboard.writeText(videoUrl)
+			setCopied(true)
+			setTimeout(() => setCopied(false), 2000)
+		}
+	}
+
 	// --- 6) Video player setup & HLS loading ---
 	useEffect(() => {
 		const video = videoRef.current
@@ -228,7 +244,6 @@ const UnifiedPlayer = ({ stream, title, tmdbId, mediaType, season, episode, init
 
 			// Restore position if initialTime is provided
 			if (initialTime && initialTime > 0) {
-				// Prevent seeking past end of video
 				const seekTime = Math.min(initialTime, video.duration - 2)
 				if (seekTime > 0) {
 					video.currentTime = seekTime
@@ -258,7 +273,10 @@ const UnifiedPlayer = ({ stream, title, tmdbId, mediaType, season, episode, init
 		}
 
 		const handleVideoError = () => {
-			setError('Erro ao reproduzir o vídeo. O link pode estar quebrado ou indisponível.')
+			if (video.error) {
+				console.error('Video native error details:', video.error.code, video.error.message)
+			}
+			setError('Erro ao reproduzir o vídeo. O link pode ter restrições CORS ou estar quebrado.')
 			setIsLoading(false)
 		}
 
@@ -286,7 +304,6 @@ const UnifiedPlayer = ({ stream, title, tmdbId, mediaType, season, episode, init
 
 				hls.on(Hls.Events.MANIFEST_PARSED, () => {
 					video.play().catch(() => {
-						// Autoplay block handling
 						setIsPlaying(false)
 					})
 				})
@@ -307,7 +324,6 @@ const UnifiedPlayer = ({ stream, title, tmdbId, mediaType, season, episode, init
 					}
 				})
 			} else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-				// Safari native HLS
 				video.src = videoUrl
 				video.play().catch(() => {
 					setIsPlaying(false)
@@ -327,7 +343,6 @@ const UnifiedPlayer = ({ stream, title, tmdbId, mediaType, season, episode, init
 		// Cleanup on URL change / destroy
 		return () => {
 			if (videoRef.current) {
-				// Save final position
 				saveProgress(videoRef.current.currentTime, videoRef.current.duration)
 			}
 
@@ -459,7 +474,7 @@ const UnifiedPlayer = ({ stream, title, tmdbId, mediaType, season, episode, init
 				)}
 			</AnimatePresence>
 
-			{/* Error display */}
+			{/* Error display with fallbacks (CORS Bypasser) */}
 			<AnimatePresence>
 				{error && (
 					<ErrorOverlay
@@ -469,7 +484,18 @@ const UnifiedPlayer = ({ stream, title, tmdbId, mediaType, season, episode, init
 					>
 						<ErrorTitle>Erro na Reprodução</ErrorTitle>
 						<ErrorSub>{error}</ErrorSub>
-						<CloseBtnSolid onClick={handleClose}>Voltar</CloseBtnSolid>
+						{videoUrl && (
+							<UrlSub>Link do Stream: <code>{videoUrl.substring(0, 60)}...</code></UrlSub>
+						)}
+						<ButtonGroup>
+							<CloseBtnSolid onClick={handleClose}>Voltar</CloseBtnSolid>
+							<ExternalPlayBtn onClick={handleOpenExternal}>
+								Assistir em Nova Aba 🚀
+							</ExternalPlayBtn>
+							<CopyBtn onClick={handleCopyLink}>
+								{copied ? 'Copiado! ✓' : 'Copiar Link'}
+							</CopyBtn>
+						</ButtonGroup>
 					</ErrorOverlay>
 				)}
 			</AnimatePresence>
@@ -632,7 +658,7 @@ const SeekBar = styled.input`
 		border-radius: 50%;
 		background: #0063e5;
 		cursor: pointer;
-		margin-top: -5px; /* adjustment depending on track height */
+		margin-top: -5px;
 		box-shadow: 0 2px 6px rgba(0,0,0,0.4);
 		transition: transform 0.1s;
 		
@@ -765,10 +791,29 @@ const ErrorSub = styled.p`
 	line-height: 1.5;
 `
 
+const UrlSub = styled.p`
+	color: rgba(255, 255, 255, 0.4);
+	font-size: 12px;
+	margin: 8px 0;
+	code {
+		background: rgba(255, 255, 255, 0.05);
+		padding: 4px 8px;
+		border-radius: 4px;
+	}
+`
+
+const ButtonGroup = styled.div`
+	display: flex;
+	gap: 12px;
+	margin-top: 16px;
+	flex-wrap: wrap;
+	justify-content: center;
+`
+
 const CloseBtnSolid = styled.button`
-	background: #0063e5;
+	background: rgba(255, 255, 255, 0.08);
 	color: #fff;
-	border: none;
+	border: 1px solid rgba(255, 255, 255, 0.15);
 	padding: 12px 32px;
 	border-radius: 8px;
 	cursor: pointer;
@@ -778,6 +823,41 @@ const CloseBtnSolid = styled.button`
 	transition: background 0.2s;
 
 	&:hover {
+		background: rgba(255, 255, 255, 0.15);
+	}
+`
+
+const ExternalPlayBtn = styled.button`
+	background: #0063e5;
+	color: #fff;
+	border: none;
+	padding: 12px 24px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 15px;
+	font-weight: 600;
+	margin-top: 12px;
+	transition: background 0.2s;
+
+	&:hover {
 		background: #0073ff;
+	}
+`
+
+const CopyBtn = styled.button`
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff;
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	padding: 12px 24px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 15px;
+	font-weight: 600;
+	margin-top: 12px;
+	transition: background 0.2s, border-color 0.2s;
+
+	&:hover {
+		background: rgba(255, 255, 255, 0.15);
+		border-color: rgba(255, 255, 255, 0.25);
 	}
 `
