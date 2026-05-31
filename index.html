@@ -10,6 +10,13 @@
 
         <script type="text/javascript">
             (function (l) {
+                // Clear any infinite loops from old redirected URLs and take user to clean base path
+                if (l.search.includes('~and~') || l.search.includes('/&/')) {
+                    window.history.replaceState(null, null, l.pathname.split('?')[0]);
+                    l.replace(l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') + '/disney-plus-clone/');
+                    return;
+                }
+
                 if (l.search[1] === "/") {
                     var decoded = l.search
                         .slice(1)
@@ -18,7 +25,13 @@
                             return s.replace(/~and~/g, "&");
                         })
                         .join("?");
-                    window.history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash);
+                    
+                    var newPath = l.pathname.slice(0, -1) + decoded + l.hash;
+                    // Prevent double slashes
+                    if (newPath.includes('//')) {
+                        newPath = newPath.replace(/\/\//g, '/');
+                    }
+                    window.history.replaceState(null, null, newPath);
                 }
             })(window.location);
         </script>
