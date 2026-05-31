@@ -289,51 +289,61 @@ const UnifiedPlayer = ({ stream, title, tmdbId, mediaType, season, episode, init
 		video.addEventListener('playing', handlePlayingState)
 		video.addEventListener('error', handleVideoError)
 
-		// HLS logic
-		const isHls = videoUrl.includes('.m3u8')
-		if (isHls) {
-			if (Hls.isSupported()) {
-				const hls = new Hls({
-					maxMaxBufferLength: 30,
-					enableWorker: true,
-					lowLatencyMode: true
-				})
-				hlsRef.current = hls
-				hls.loadSource(videoUrl)
-				hls.attachMedia(video)
+		// HLS logic: try Hls.js first if it's not explicitly a direct common video file extension,
+		// and fallback to standard native video src loading if Hls.js fails to load/parse the manifest.
+		const isDirectVideo = videoUrl.endsWith('.mp4') || videoUrl.endsWith('.webm') || videoUrl.endsWith('.mkv') || videoUrl.includes('.mp4?') || videoUrl.includes('.webm?')
+		
+		if (!isDirectVideo && Hls.isSupported()) {
+			const hls = new Hls({
+				maxMaxBufferLength: 30,
+				enableWorker: true,
+				lowLatencyMode: true
+			})
+			hlsRef.current = hls
+			hls.loadSource(videoUrl)
+			hls.attachMedia(video)
 
-				hls.on(Hls.Events.MANIFEST_PARSED, () => {
-					video.play().catch(() => {
-						setIsPlaying(false)
-					})
-				})
-
-				hls.on(Hls.Events.ERROR, (event, data) => {
-					if (data.fatal) {
-						switch (data.type) {
-							case Hls.ErrorTypes.NETWORK_ERROR:
-								hls.startLoad()
-								break
-							case Hls.ErrorTypes.MEDIA_ERROR:
-								hls.recoverMediaError()
-								break
-							default:
-								handleVideoError()
-								break
-						}
-					}
-				})
-			} else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-				video.src = videoUrl
+			hls.on(Hls.Events.MANIFEST_PARSED, () => {
 				video.play().catch(() => {
 					setIsPlaying(false)
 				})
-			} else {
-				setError('Este navegador não suporta a reprodução deste formato HLS.')
-				setIsLoading(false)
-			}
+			})
+
+			hls.on(Hls.Events.ERROR, (event, data) => {
+				if (data.fatal) {
+					switch (data.type) {
+						case Hls.ErrorTypes.NETWORK_ERROR:
+							if (data.details === Hls.ErrorDetails.MANIFEST_LOAD_ERROR || data.details === Hls.ErrorDetails.MANIFEST_PARSING_ERROR) {
+								console.warn('Hls.js failed to load manifest, falling back to native player:', data.details);
+								hls.destroy();
+								hlsRef.current = null;
+								video.src = videoUrl;
+								video.play().catch(() => {});
+							} else {
+								hls.startLoad();
+							}
+							break
+						case Hls.ErrorTypes.MEDIA_ERROR:
+							hls.recoverMediaError()
+							break
+						default:
+							// Try to destroy Hls.js and fallback to native playback
+							console.warn('Hls.js fatal error, falling back to native player');
+							hls.destroy();
+							hlsRef.current = null;
+							video.src = videoUrl;
+							video.play().catch(() => handleVideoError());
+							break
+					}
+				}
+			})
+		} else if (video.canPlayType('application/vnd.apple.mpegurl') && !isDirectVideo) {
+			video.src = videoUrl
+			video.play().catch(() => {
+				setIsPlaying(false)
+			})
 		} else {
-			// Normal mp4/webm stream
+			// Normal mp4/webm/mkv stream or fallback direct loading
 			video.src = videoUrl
 			video.play().catch(() => {
 				setIsPlaying(false)
@@ -343,6 +353,7 @@ const UnifiedPlayer = ({ stream, title, tmdbId, mediaType, season, episode, init
 		// Cleanup on URL change / destroy
 		return () => {
 			if (videoRef.current) {
+				// Save final position
 				saveProgress(videoRef.current.currentTime, videoRef.current.duration)
 			}
 

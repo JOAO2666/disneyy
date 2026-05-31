@@ -5,7 +5,7 @@ import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import CircularProgress from '@mui/material/CircularProgress'
 
-const BACKEND_URL = 'http://localhost:8000'
+const TMDB_API_KEY = '35f3fea26d7c6bea37a8777ddbddbed3'
 
 const StreamModal = ({ isOpen, onClose, onPlay, tmdbId, title }) => {
 	const [loading, setLoading] = useState(false)
@@ -26,22 +26,31 @@ const StreamModal = ({ isOpen, onClose, onPlay, tmdbId, title }) => {
 			return
 		}
 		fetchSeasons()
-	}, [isOpen])
+	}, [isOpen, tmdbId])
 
 	const fetchSeasons = async () => {
 		setLoading(true)
 		setError('')
 		try {
-			const resp = await fetch(`${BACKEND_URL}/api/seasons/${tmdbId}`)
+			// Query TMDB directly for TV show details to get seasons
+			const resp = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${TMDB_API_KEY}&language=pt-BR`)
+			if (!resp.ok) {
+				throw new Error('Failed to fetch from TMDB')
+			}
 			const data = await resp.json()
-			if (data.seasons?.length > 0) {
-				setSeasons(data.seasons)
+			
+			// Filter out season 0 (specials) if it has no episodes
+			const validSeasons = (data.seasons || []).filter(s => s.season_number > 0 && s.episode_count > 0)
+			
+			if (validSeasons.length > 0) {
+				setSeasons(validSeasons)
 				setStep('select-season')
 			} else {
 				setError('Nenhuma temporada encontrada.')
 			}
-		} catch {
-			setError('Erro ao conectar com o servidor.')
+		} catch (err) {
+			console.error('Error fetching seasons:', err)
+			setError('Erro ao carregar as temporadas. Tente novamente mais tarde.')
 		}
 		setLoading(false)
 	}
@@ -50,15 +59,21 @@ const StreamModal = ({ isOpen, onClose, onPlay, tmdbId, title }) => {
 		setLoading(true)
 		setSelectedSeason(seasonNumber)
 		try {
-			const resp = await fetch(`${BACKEND_URL}/api/episodes/${tmdbId}/${seasonNumber}`)
+			// Query TMDB directly for TV show season details to get episodes
+			const resp = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${seasonNumber}?api_key=${TMDB_API_KEY}&language=pt-BR`)
+			if (!resp.ok) {
+				throw new Error('Failed to fetch from TMDB')
+			}
 			const data = await resp.json()
+			
 			if (data.episodes?.length > 0) {
 				setEpisodes(data.episodes)
 				setStep('select-episode')
 			} else {
 				setError('Nenhum episódio encontrado.')
 			}
-		} catch {
+		} catch (err) {
+			console.error('Error fetching episodes:', err)
 			setError('Erro ao buscar episódios.')
 		}
 		setLoading(false)
