@@ -23,3 +23,89 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Android / Capacitor
+/android/
+android.keystore
+*.keystore
+*.jks
+local.properties
+.gradle/
+*.apk
+*.aab
+*.so
+*.o
+*.a
+*.dylib
+*.dll
+*.exe
+*.app/
+ion-app-scripts/
+@ionic/app-scripts/
+
+# Capacitor
+capacitor-js-files/
+.capacitorrc.json
+
+# Build outputs
+build/
+release/
+.gradle
+.gradle/
+
+# IDE
+.classpath
+.project
+.settings/
+*.iml
+.gradle
+.navigation
+capture_screen*.png
+
+# Sublime Text
+*.tmlanguage.cache
+*.tmPreferences.bak
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+
+# VS Code
+.history/
+.vscode/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+*.swp
+.Spotlight-V100
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Xcode
+.xcodeproj/
+.xcworkspace/
+*.xcworkspace
+*.pbxproj
+*.pbxuser
+*.perspectivev3
+*.xccheckout
+*.xcscmblueprint
+deriveddata/
+
+# Android Emulator
+.android/
+emulator/
+
+# Firebase
+.firebase/
+.firebaserc
+.env.local
+.env.production.local
+
+# Misc
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp

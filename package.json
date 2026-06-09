@@ -10,9 +10,25 @@
 		"dev": "vite",
 		"build": "vite build",
 		"lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"cap-sync": "cap sync",
+		"cap-copy": "cap copy android",
+		"cap-build": "npm run build && cap sync android",
+		"cap-open": "cap open android",
+		"cap-run": "cap run android",
+		"android-build": "npm run build && cap sync && cap copy android",
+		"android-studio": "cap open android",
+		"android-emulator": "cap run android",
+		"android-release": "npm run build && cap sync && cap copy android && echo 'Build APK no Android Studio: Build > Generate Signed Bundle / APK'"
 	},
 	"dependencies": {
+		"@capacitor/android": "^6.0.0",
+		"@capacitor/app": "^6.0.0",
+		"@capacitor/core": "^6.0.0",
+		"@capacitor/device": "^6.0.0",
+		"@capacitor/keyboard": "^6.0.0",
+		"@capacitor/splash-screen": "^6.0.0",
+		"@capacitor/status-bar": "^6.0.0",
 		"@emotion/react": "^11.11.3",
 		"@emotion/styled": "^11.11.0",
 		"@mui/icons-material": "^5.15.3",
@@ -36,6 +52,7 @@
 		"styled-components": "^6.1.8"
 	},
 	"devDependencies": {
+		"@capacitor/cli": "^6.0.0",
 		"@types/react": "^18.2.47",
 		"@types/react-dom": "^18.2.18",
 		"@vitejs/plugin-react": "^4.2.1",
